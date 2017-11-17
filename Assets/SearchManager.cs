@@ -5,6 +5,8 @@ using System.Threading;
 
 public class SearchManager : MonoBehaviour{
 	public static SearchManager singleton;
+	[SerializeField]
+	Map map;
 
 	Thread workerThread;
 	List<PathAgent> agents;
@@ -28,29 +30,35 @@ public class SearchManager : MonoBehaviour{
 
 		while(true){
 			//Debug.Log("This is thread");
-			
 
 
 			if(agents.Count > 0){
 				lock(agents){
 					currentAgent = agents[curAgentIndex];
-					if(currentAgent == null){
+
+					while(currentAgent == null){
 						agents.RemoveAt(curAgentIndex);
+						currentAgent = agents[curAgentIndex];
+						if(curAgentIndex >= agents.Count){
+							curAgentIndex = 0;
+						}
 					}
-					else{
-						curAgentIndex++;
-					}
+
+					curAgentIndex++;
 				}
-				currentAgent.FindPath();
+
+				map.FindPath(currentAgent);
+
 				if(curAgentIndex >= agents.Count){
 					curAgentIndex = 0;
 				}
+
 			}
 			else{
 				curAgentIndex = 0;
 			}
 
-			 Thread.Sleep(5);
+			Thread.Sleep(5);
 		}
 
 

@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class PathAgent : MonoBehaviour {
 	string objectName;
+
+	Vector2 curPos, targetPos;
+
+	int[] curPath;
+
+
 	void Start(){
+		targetPos = new Vector2(Random.Range(0, 9), Random.Range(0, 9));
 		objectName = transform.name;
 		SearchManager.singleton.RegisterPathAgent(this);
 	}
@@ -12,10 +19,16 @@ public class PathAgent : MonoBehaviour {
 		SearchManager.singleton.DeregisterPathAgent(this);
     }
 
-	public void FindPath(){
-		//NOTE: warning, this is not run on main unity thread, I'm not sure what this is allowed to touch that won't cause a black hole to appear and destroy whatever city you happen to be in when you modify this code. BE CAREFUL.
-		//TODO: put pathfinding here, it will be run on the pathfinding thread
-		Debug.Log("This is find path for object: " + objectName);
+	void Update(){
+		curPos = new Vector2(transform.position.x, transform.position.z);
+
+		//TODO: follow path here
 	}
+
+	public Vector2 CurPos{get{return curPos;}}
+	public Vector2 TargetPos{get{return targetPos;}}
+
+	public int[] Path{set{curPath = value;}}
+
 
 }

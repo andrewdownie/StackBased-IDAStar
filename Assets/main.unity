@@ -198,7 +198,7 @@ GameObject:
   - component: {fileID: 727591527}
   - component: {fileID: 727591526}
   m_Layer: 0
-  m_Name: MapChunkTest
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -216,8 +216,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkWorldPosition: {x: 0, y: 0, z: 0}
-  chunkWorldScale: {x: 0, y: 0, z: 0}
-  chunkDimensions: {x: 0, y: 0, z: 0}
+  width: 10
+  height: 10
   movementModifier: 
 --- !u!4 &727591527
 Transform:
@@ -426,3 +426,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce4dc2587e6c0124abcb85b7431ac1bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  map: {fileID: 727591526}

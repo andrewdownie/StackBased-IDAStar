@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Int2.cs" />
-     <Compile Include="Assets\MapChunk.cs" />
+     <Compile Include="Assets\Map.cs" />
      <Compile Include="Assets\PathAgent.cs" />
      <Compile Include="Assets\SearchManager.cs" />
  <Reference Include="UnityEngine.UI">
