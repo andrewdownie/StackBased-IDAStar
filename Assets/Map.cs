@@ -1,6 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//TODO: it currently hangs on start...
+
+public struct Node{
+	public int id;
+	public byte movement;
+
+	public Node(int id, byte movement){
+		this.movement = movement;
+		this.id = id;
+	}
+
+}
 
 public class Map : MonoBehaviour {
 	[Header("World")]
@@ -17,7 +29,7 @@ public class Map : MonoBehaviour {
 	[SerializeField]
 	int height;
 	[SerializeField]
-	byte[] movementModifier;
+	Node[] nodes;
 	//Variable: movement ----
 	//	Inverse percent. Think about it as modifying the effective distance the player has to move to get to a point.
 	//	100 means the player moves regular speed.
@@ -30,27 +42,30 @@ public class Map : MonoBehaviour {
 	//		player movement speed by the movmentModifier of the tile they are touching, and it will act as a movement speed percent modifier)
 
 	void Start(){
-		movementModifier = new byte[width * height];
+		nodes = new Node[width * height];
 
 		//Fill the map with random movement speeds
 		for(int x = 0; x < width; x++){
 			for(int y = 0; y < height; y++){
 				int index = x * height + y;
-				movementModifier[index] = (byte)Random.Range(0, 255);
-				if(movementModifier[index] > 200){
-					movementModifier[index] = 0;
+				byte b = (byte)Random.Range(0, 255);
+				if(b > 200){
+					b = 0;
 				}
+				int id = y * width + x;
+				nodes[id] = new Node(id, b);
 			}
 		}
 	
 	}
 
 	void OnDrawGizmos(){
-		if(movementModifier == null || movementModifier.Length == 0){ return; }
+		return;
+		if(nodes == null || nodes.Length == 0){ return; }
 
 		for(int x = 0; x < width; x++){
 			for(int y = 0; y < height; y++){
-				byte b = movementModifier[x * height + y];
+				byte b = nodes[x * height + y].movement;
 
 				if(b == 0){
 					Gizmos.color = Color.red;
@@ -77,16 +92,36 @@ public class Map : MonoBehaviour {
 	int[] IDAStar(Vector2 curPos, Vector2 targetPos){
 		//TODO: put a time limit, and then perform IDAStar until that time limit is hit, return the most recent completed result
 		int start = (int)curPos.y * width + (int)curPos.x;
-		//int target = (int)targetPos.x * width + (int)targetPos.y;
+		int target = (int)targetPos.y * width + (int)targetPos.x;
 
 		Debug.Log("Start: " + start);
+		int[] lastPath = null;
+		int curDepth = 1;
 
-		return Neighbours(start);
+		for(int i = 0; i < 10; i++){//TOOD: change to time, instead of depth
+			lastPath = _IDAStar(start, target, curDepth);
+			curDepth++;
+		}
+		
+
+		return lastPath;
+	}
+
+	int[] _IDAStar(int start, int target, int depth){
+		List<int> open = new List<int>();//How do I store f-costs without using objects
+		List<int> closed = new List<int>();
+		open.Add(start);
+
+		while(open.Count != 0){
+
+		}
+
+		return null;
 	}
 
 
 
-	int[] Neighbours(int start){
+	int[] GetNeighbours(int start){
 		bool top = false, left = false, bottom = false, right = false;
 		int[] neighbours = null;
 		int x, y;
@@ -112,7 +147,6 @@ public class Map : MonoBehaviour {
 				neighbours[2] = start + width;//Bottom
 			}
 			else if(right){
-				Debug.Log("Top right");
 				neighbours = new int[3];
 				neighbours[0] = start + width;//Bottom
 				neighbours[1] = start + width - 1;//Bottom left

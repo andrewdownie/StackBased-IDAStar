@@ -135,6 +135,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4002bb403ead8da4587e623c3cefdc19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  curPos: {x: 0, y: 0}
+  targetPos: {x: 0, y: 0}
 --- !u!4 &326630776
 Transform:
   m_ObjectHideFlags: 0
