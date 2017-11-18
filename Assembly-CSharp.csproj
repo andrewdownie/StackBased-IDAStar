@@ -55,7 +55,7 @@
      <Compile Include="Assets\Int2.cs" />
      <Compile Include="Assets\Map.cs" />
      <Compile Include="Assets\PathAgent.cs" />
-     <Compile Include="Assets\SearchManager.cs" />
+     <Compile Include="Assets\PathingThread.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

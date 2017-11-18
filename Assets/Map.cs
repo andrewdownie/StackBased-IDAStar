@@ -73,7 +73,9 @@ public class Map : MonoBehaviour {
 		agent.Path = IDAStar(curPos, targetPos);
 	}
 
-	public int[] IDAStar(Vector2 curPos, Vector2 targetPos){
+
+	int[] IDAStar(Vector2 curPos, Vector2 targetPos){
+		//TODO: put a time limit, and then perform IDAStar until that time limit is hit, return the most recent completed result
 		int start = (int)curPos.x * height + (int)curPos.y;
 		int target = (int)targetPos.x * height + (int)targetPos.y;
 
@@ -91,25 +93,23 @@ public class Map : MonoBehaviour {
 
 
 	int[] Neighbours(int start){
+		bool top = false, left = false, bottom = false, right = false;
 		int[] neighbours = null;
 		int row, col;
 
-		row = start / width;
-		col = start % width;
-
-		Debug.Log("x,y: " + row + "," + col);
-
-		//TODO: since it wraps around, how do I detect edges?.
-		//Top left is zero, counter clockwise movement
-		bool top = false, left = false, bottom = false, right = false;
+		col = start / width;
+		row = start % width;
 
 		top = row == 0;
 		bottom = row == height - 1;
 		left = col == 0;
 		right = col == width - 1;
 
+		Debug.Log("x,y: " + row + "," + col);
+		Debug.Log(top + ", " + left + ", " + bottom + ", " + right);
 
-		//Very unclever, but should perform fast
+
+		//Very unclever, but should perform fast enough
 		if(top){
 			if(left){
 				neighbours = new int[3];
@@ -170,6 +170,8 @@ public class Map : MonoBehaviour {
 
 		return neighbours;
 	}
+
+
 
 }
 

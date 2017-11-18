@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
 
-public class SearchManager : MonoBehaviour{
-	public static SearchManager singleton;
+public class PathingThread : MonoBehaviour{
+	public static PathingThread singleton;
 	[SerializeField]
 	Map map;
 

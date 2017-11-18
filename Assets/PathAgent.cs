@@ -5,6 +5,7 @@ using UnityEngine;
 public class PathAgent : MonoBehaviour {
 	string objectName;
 
+	[SerializeField]
 	Vector2 curPos, targetPos;
 
 	int[] curPath;
@@ -13,14 +14,14 @@ public class PathAgent : MonoBehaviour {
 	void Start(){
 		targetPos = new Vector2(Random.Range(0, 9), Random.Range(0, 9));
 		objectName = transform.name;
-		SearchManager.singleton.RegisterPathAgent(this);
+		PathingThread.singleton.RegisterPathAgent(this);
 	}
 	void OnDestroy() {
-		SearchManager.singleton.DeregisterPathAgent(this);
+		PathingThread.singleton.DeregisterPathAgent(this);
     }
 
 	void Update(){
-		curPos = new Vector2(transform.position.x, transform.position.z);
+		//curPos = new Vector2(transform.position.x, transform.position.z);
 
 		//TODO: follow path here ------------------------------
 	}
