@@ -22,7 +22,7 @@ public class PathAgent : MonoBehaviour {
 	void Update(){
 		curPos = new Vector2(transform.position.x, transform.position.z);
 
-		//TODO: follow path here
+		//TODO: follow path here ------------------------------
 	}
 
 	public Vector2 CurPos{get{return curPos;}}

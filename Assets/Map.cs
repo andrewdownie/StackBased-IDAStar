@@ -70,12 +70,105 @@ public class Map : MonoBehaviour {
 	public void FindPath(PathAgent agent){
 		Vector2 curPos = agent.CurPos;
 		Vector2 targetPos = agent.TargetPos;
+		agent.Path = IDAStar(curPos, targetPos);
+	}
 
-		int[] newPath = null;
+	public int[] IDAStar(Vector2 curPos, Vector2 targetPos){
+		int start = (int)curPos.x * height + (int)curPos.y;
+		int target = (int)targetPos.x * height + (int)targetPos.y;
 
-		//TODO: put pathfinding here
+		int[] neighbours = Neighbours(start);
+		string output = "{";
+		foreach(int i in neighbours){
+			output += i + ",";
+		}
+		output += "}";
+		Debug.Log(output);
 
-		agent.Path = newPath;
+		return null;
+	}
+
+
+
+	int[] Neighbours(int start){
+		int[] neighbours = null;
+		int row, col;
+
+		row = start / width;
+		col = start % width;
+
+		Debug.Log("x,y: " + row + "," + col);
+
+		//TODO: since it wraps around, how do I detect edges?.
+		//Top left is zero, counter clockwise movement
+		bool top = false, left = false, bottom = false, right = false;
+
+		top = row == 0;
+		bottom = row == height - 1;
+		left = col == 0;
+		right = col == width - 1;
+
+
+		//Very unclever, but should perform fast
+		if(top){
+			if(left){
+				neighbours = new int[3];
+				neighbours[0] = start + 1;//Right
+				neighbours[1] = start + width + 1;//Bottom right
+				neighbours[2] = start + width;//Bottom
+			}
+			else if(right){
+				neighbours = new int[3];
+				neighbours[5] = start + width;//Bottom
+				neighbours[6] = start + width - 1;//Bottom left
+				neighbours[7] = start - 1;//Left
+			}
+			else{
+				neighbours = new int[5];
+				neighbours[0] = start + 1;//Right
+				neighbours[1] = start + width + 1;//Bottom right
+				neighbours[2] = start + width;//Bottom
+				neighbours[3] = start + width - 1;//Bottom left
+				neighbours[4] = start - 1;//Left
+			}
+		}
+		else if(bottom){
+			if(left){
+				neighbours = new int[3];
+				neighbours[1] = start - width;//Top
+				neighbours[2] = start - width + 1;//Top right
+				neighbours[3] = start + 1;//Right
+			}
+			else if(right){
+				neighbours = new int[3];
+				neighbours[0] = start - width - 1;//Top left
+				neighbours[1] = start - width;//Top
+				neighbours[2] = start - 1;//Left
+			}
+			else{
+				neighbours = new int[5];
+				neighbours[0] = start - width - 1;//Top left
+				neighbours[1] = start - width;//Top
+				neighbours[2] = start - width + 1;//Top right
+				neighbours[3] = start + 1;//Right
+				neighbours[4] = start - 1;//Left
+			}
+		}
+		else{
+			neighbours = new int[8];
+			neighbours[0] = start - width - 1;//Top left
+			neighbours[1] = start - width;//Top
+			neighbours[2] = start - width + 1;//Top right
+			neighbours[3] = start + 1;//Right
+			neighbours[4] = start + width + 1;//Bottom right
+			neighbours[5] = start + width;//Bottom
+			neighbours[6] = start + width - 1;//Bottom left
+			neighbours[7] = start - 1;//Left
+		}
+
+
+
+		return neighbours;
 	}
 
 }
