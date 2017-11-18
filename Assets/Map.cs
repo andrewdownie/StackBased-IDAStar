@@ -76,18 +76,12 @@ public class Map : MonoBehaviour {
 
 	int[] IDAStar(Vector2 curPos, Vector2 targetPos){
 		//TODO: put a time limit, and then perform IDAStar until that time limit is hit, return the most recent completed result
-		int start = (int)curPos.x * height + (int)curPos.y;
-		int target = (int)targetPos.x * height + (int)targetPos.y;
+		int start = (int)curPos.y * width + (int)curPos.x;
+		//int target = (int)targetPos.x * width + (int)targetPos.y;
 
-		int[] neighbours = Neighbours(start);
-		string output = "{";
-		foreach(int i in neighbours){
-			output += i + ",";
-		}
-		output += "}";
-		Debug.Log(output);
+		Debug.Log("Start: " + start);
 
-		return null;
+		return Neighbours(start);
 	}
 
 
@@ -95,17 +89,17 @@ public class Map : MonoBehaviour {
 	int[] Neighbours(int start){
 		bool top = false, left = false, bottom = false, right = false;
 		int[] neighbours = null;
-		int row, col;
+		int x, y;
 
-		col = start / width;
-		row = start % width;
+		y = start / width;
+		x = start % width;
 
-		top = row == 0;
-		bottom = row == height - 1;
-		left = col == 0;
-		right = col == width - 1;
+		top = y == 0;
+		bottom = y == height - 1;
+		left = x == 0;
+		right = x == width - 1;
 
-		Debug.Log("x,y: " + row + "," + col);
+		Debug.Log("x,y: " + y + "," + x);
 		Debug.Log(top + ", " + left + ", " + bottom + ", " + right);
 
 
@@ -118,10 +112,11 @@ public class Map : MonoBehaviour {
 				neighbours[2] = start + width;//Bottom
 			}
 			else if(right){
+				Debug.Log("Top right");
 				neighbours = new int[3];
-				neighbours[5] = start + width;//Bottom
-				neighbours[6] = start + width - 1;//Bottom left
-				neighbours[7] = start - 1;//Left
+				neighbours[0] = start + width;//Bottom
+				neighbours[1] = start + width - 1;//Bottom left
+				neighbours[2] = start - 1;//Left
 			}
 			else{
 				neighbours = new int[5];
@@ -135,9 +130,9 @@ public class Map : MonoBehaviour {
 		else if(bottom){
 			if(left){
 				neighbours = new int[3];
-				neighbours[1] = start - width;//Top
-				neighbours[2] = start - width + 1;//Top right
-				neighbours[3] = start + 1;//Right
+				neighbours[0] = start - width;//Top
+				neighbours[1] = start - width + 1;//Top right
+				neighbours[2] = start + 1;//Right
 			}
 			else if(right){
 				neighbours = new int[3];

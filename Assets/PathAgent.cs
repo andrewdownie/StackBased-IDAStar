@@ -24,6 +24,20 @@ public class PathAgent : MonoBehaviour {
 		//curPos = new Vector2(transform.position.x, transform.position.z);
 
 		//TODO: follow path here ------------------------------
+		PrintCurPath();
+	}
+
+	void PrintCurPath(){
+		if(curPath == null){
+			return;
+		}
+
+		string output = "{";
+		foreach(int i in curPath){
+			output += i + ",";
+		}
+		output += "}";
+		Debug.Log(output);
 	}
 
 	public Vector2 CurPos{get{return curPos;}}
