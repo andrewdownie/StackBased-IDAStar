@@ -24,42 +24,53 @@ public class PathingThread : MonoBehaviour{
 		workerThread.Start();
 	}
 
+	void OnApplicationQuit()
+    {
+		workerThread.Abort();
+    }
+
 
 	void PathFinding(){
 		PathAgent currentAgent;
+		try{
 
-		while(true){
-			Debug.Log("This is thread");
+			while(true){
+				Debug.Log("This is thread");
 
 
-			if(agents.Count > 0){
-				lock(agents){
-					currentAgent = agents[curAgentIndex];
-
-					while(currentAgent == null){
-						agents.RemoveAt(curAgentIndex);
+				if(agents.Count > 0){
+					lock(agents){
 						currentAgent = agents[curAgentIndex];
-						if(curAgentIndex >= agents.Count){
-							curAgentIndex = 0;
+
+						while(currentAgent == null){
+							agents.RemoveAt(curAgentIndex);
+							currentAgent = agents[curAgentIndex];
+							if(curAgentIndex >= agents.Count){
+								curAgentIndex = 0;
+							}
 						}
+
+						curAgentIndex++;
 					}
 
-					curAgentIndex++;
+					map.FindPath(currentAgent);
+
+					if(curAgentIndex >= agents.Count){
+						curAgentIndex = 0;
+					}
+
 				}
-
-				map.FindPath(currentAgent);
-
-				if(curAgentIndex >= agents.Count){
+				else{
 					curAgentIndex = 0;
 				}
 
+				Thread.Sleep(5);
 			}
-			else{
-				curAgentIndex = 0;
-			}
-
-			Thread.Sleep(5);
 		}
+		catch(System.Exception e){
+			Debug.Log(e);
+		}
+
 
 
 	}
@@ -82,10 +93,6 @@ public class PathingThread : MonoBehaviour{
 		}
 	}
 
-	 void OnApplicationQuit()
-    {
-		workerThread.Abort();
-    }
 
 
 

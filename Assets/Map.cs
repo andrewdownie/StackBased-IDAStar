@@ -1,20 +1,49 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//TODO: it currently hangs on start...
 
-public struct Node{
-	public int id;
-	public byte movement;
+[System.Serializable]
+public class Node{
+	float movement;
+	Map parent;
+	[SerializeField]
+	int id;
+	[SerializeField]
+	int x, y;
 
-	public Node(int id, byte movement){
+	public Node(Map parent, int id, int x, int y, float movement){
 		this.movement = movement;
+		this.parent = parent;
 		this.id = id;
+		this.x = x;
+		this.y = y;
+	}
+
+
+	//TODO: pretty sure x and y are mixed up-------------------------------------------------
+	public int X{
+		get{return x;}
+	}
+
+	public int Y{
+		get{return y;}
+	}
+
+	public float Movement{
+		get{return movement;}
+	}
+
+	public int ID{
+		get{return id;}
 	}
 
 }
 
+
 public class Map : MonoBehaviour {
+	[SerializeField]
+	List<Node> testingNeighbours;// ---------
+
 	[Header("World")]
 	[SerializeField]
 	Vector3 chunkWorldPosition;
@@ -29,7 +58,7 @@ public class Map : MonoBehaviour {
 	[SerializeField]
 	int height;
 	[SerializeField]
-	Node[] nodes;
+	Node[,] nodes;
 	//Variable: movement ----
 	//	Inverse percent. Think about it as modifying the effective distance the player has to move to get to a point.
 	//	100 means the player moves regular speed.
@@ -41,38 +70,46 @@ public class Map : MonoBehaviour {
 	//	(WHEN doing player movement, the player movement speed can be stored already divided by 1/100, then simply multiply the
 	//		player movement speed by the movmentModifier of the tile they are touching, and it will act as a movement speed percent modifier)
 
+	public int Width{
+		get{return width;}
+	}
+	public int Height{
+		get{return height;}
+	}
+
 	void Start(){
-		nodes = new Node[width * height];
+		nodes = new Node[width, height];
 
 		//Fill the map with random movement speeds
 		for(int x = 0; x < width; x++){
 			for(int y = 0; y < height; y++){
-				int index = x * height + y;
-				byte b = (byte)Random.Range(0, 255);
-				if(b > 200){
-					b = 0;
+				float movement = Random.Range(0f, 1f);
+				if(movement < 0.1f){
+					movement = 0;
 				}
 				int id = y * width + x;
-				nodes[id] = new Node(id, b);
+				nodes[x, y] = new Node(this, id, x, y, movement);
 			}
 		}
 	
 	}
 
 	void OnDrawGizmos(){
-		return;
 		if(nodes == null || nodes.Length == 0){ return; }
 
 		for(int x = 0; x < width; x++){
 			for(int y = 0; y < height; y++){
-				byte b = nodes[x * height + y].movement;
+				float movement = nodes[x, y].Movement;
 
-				if(b == 0){
+
+				if(testingNeighbours.Contains(nodes[x, y])){
+					Gizmos.color = Color.yellow;
+				}
+				else if(movement == 0){
 					Gizmos.color = Color.red;
 				}
 				else{
-					float hue = (float)(b + 55)/255;
-					Gizmos.color = new Color(hue, hue, hue);
+					Gizmos.color = new Color(movement, movement, movement);
 				}
 				Gizmos.DrawCube(transform.position + new Vector3(x, 0, y), new Vector3(0.6f, 0.1f, 0.6f));
 
@@ -83,9 +120,17 @@ public class Map : MonoBehaviour {
 
 
 	public void FindPath(PathAgent agent){
-		Vector2 curPos = agent.CurPos;
-		Vector2 targetPos = agent.TargetPos;
-		agent.Path = IDAStar(curPos, targetPos);
+		Vector3 curPos = agent.CurPos;
+		Vector3 targetPos = agent.TargetPos;
+		Node curNode, targetNode;
+
+
+
+		//agent.Path = IDAStar(curPos, targetPos);
+		curNode = this.PosToNode(curPos);
+		//targetNode = this.PosToNode(targetPos);
+		Debug.Log("Neighbours are... " + curPos + " - " + curNode.X + "," + curNode.Y);
+		testingNeighbours = new List<Node>(this.Neighbours(curNode));
 	}
 
 
@@ -119,88 +164,26 @@ public class Map : MonoBehaviour {
 		return null;
 	}
 
+	public Node this[int x, int y]{
+		get{
 
-
-	int[] GetNeighbours(int start){
-		bool top = false, left = false, bottom = false, right = false;
-		int[] neighbours = null;
-		int x, y;
-
-		y = start / width;
-		x = start % width;
-
-		top = y == 0;
-		bottom = y == height - 1;
-		left = x == 0;
-		right = x == width - 1;
-
-		Debug.Log("x,y: " + y + "," + x);
-		Debug.Log(top + ", " + left + ", " + bottom + ", " + right);
-
-
-		//Very unclever, but should perform fast enough
-		if(top){
-			if(left){
-				neighbours = new int[3];
-				neighbours[0] = start + 1;//Right
-				neighbours[1] = start + width + 1;//Bottom right
-				neighbours[2] = start + width;//Bottom
+			if(x >= width){
+				x = width - 1;
 			}
-			else if(right){
-				neighbours = new int[3];
-				neighbours[0] = start + width;//Bottom
-				neighbours[1] = start + width - 1;//Bottom left
-				neighbours[2] = start - 1;//Left
+			else if(x < 0){
+				x = 0;
 			}
-			else{
-				neighbours = new int[5];
-				neighbours[0] = start + 1;//Right
-				neighbours[1] = start + width + 1;//Bottom right
-				neighbours[2] = start + width;//Bottom
-				neighbours[3] = start + width - 1;//Bottom left
-				neighbours[4] = start - 1;//Left
+
+			if(y >= height){
+				y = height - 1;
 			}
+			else if(y < 0){
+				y = 0;
+			}
+
+			return nodes[x, y];
 		}
-		else if(bottom){
-			if(left){
-				neighbours = new int[3];
-				neighbours[0] = start - width;//Top
-				neighbours[1] = start - width + 1;//Top right
-				neighbours[2] = start + 1;//Right
-			}
-			else if(right){
-				neighbours = new int[3];
-				neighbours[0] = start - width - 1;//Top left
-				neighbours[1] = start - width;//Top
-				neighbours[2] = start - 1;//Left
-			}
-			else{
-				neighbours = new int[5];
-				neighbours[0] = start - width - 1;//Top left
-				neighbours[1] = start - width;//Top
-				neighbours[2] = start - width + 1;//Top right
-				neighbours[3] = start + 1;//Right
-				neighbours[4] = start - 1;//Left
-			}
-		}
-		else{
-			neighbours = new int[8];
-			neighbours[0] = start - width - 1;//Top left
-			neighbours[1] = start - width;//Top
-			neighbours[2] = start - width + 1;//Top right
-			neighbours[3] = start + 1;//Right
-			neighbours[4] = start + width + 1;//Bottom right
-			neighbours[5] = start + width;//Bottom
-			neighbours[6] = start + width - 1;//Bottom left
-			neighbours[7] = start - 1;//Left
-		}
-
-
-
-		return neighbours;
 	}
-
-
 
 }
 

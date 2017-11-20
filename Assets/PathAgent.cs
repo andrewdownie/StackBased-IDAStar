@@ -6,9 +6,9 @@ public class PathAgent : MonoBehaviour {
 	string objectName;
 
 	[SerializeField]
-	Vector2 curPos, targetPos;
+	Vector3 curPos, targetPos;
 
-	int[] curPath;
+	Node[] curPath;
 
 
 	void Start(){
@@ -32,18 +32,18 @@ public class PathAgent : MonoBehaviour {
 			return;
 		}
 
-		string output = "{";
-		foreach(int i in curPath){
-			output += i + ",";
+		string output = "{ ";
+		foreach(Node n in curPath){
+			output += "(" + n.X + "," + n.Y + "), ";
 		}
-		output += "}";
+		output += " }";
 		Debug.Log(output);
 	}
 
-	public Vector2 CurPos{get{return curPos;}}
-	public Vector2 TargetPos{get{return targetPos;}}
+	public Vector3 CurPos{get{return curPos;}}
+	public Vector3 TargetPos{get{return targetPos;}}
 
-	public int[] Path{set{curPath = value;}}
+	public Node[] Path{set{curPath = value;}}
 
 
 }
