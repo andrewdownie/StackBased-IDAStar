@@ -27,6 +27,16 @@ public class PathAgent : MonoBehaviour {
 		PrintCurPath();
 	}
 
+	void OnDrawGizmos(){
+		if(curPath == null || curPath.Length == 0){ return; }
+
+		foreach(Node n in curPath){
+			Gizmos.color = Color.yellow;
+			Gizmos.DrawCube(new Vector3(n.X, 3, n.Y), new Vector3(0.3f, 1f, 0.3f));
+		}
+
+	}
+
 	void PrintCurPath(){
 		if(curPath == null){
 			return;

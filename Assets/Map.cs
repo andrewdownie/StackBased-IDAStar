@@ -5,9 +5,6 @@ using UnityEngine;
 
 
 public class Map : MonoBehaviour {
-	[SerializeField]
-	List<Node> testingNeighbours;// ---------
-
 	[Header("World")]
 	[SerializeField]
 	Vector3 chunkWorldPosition;
@@ -66,10 +63,7 @@ public class Map : MonoBehaviour {
 				float movement = nodes[x, y].Movement;
 
 
-				if(testingNeighbours.Contains(nodes[x, y])){
-					Gizmos.color = Color.yellow;
-				}
-				else if(movement == 0){
+				if(movement == 0){
 					Gizmos.color = Color.red;
 				}
 				else{
@@ -93,7 +87,6 @@ public class Map : MonoBehaviour {
 		curNode = this.PosToNode(curPos);
 		targetNode = this.PosToNode(targetPos);
 		agent.Path = IterativeDeepeningAStar(curNode, targetNode);
-		//testingNeighbours = new List<Node>(this.Neighbours(curNode));
 	}
 
 
@@ -102,7 +95,7 @@ public class Map : MonoBehaviour {
 		Node[] lastPath = null;
 		int curDepth = 1;
 
-		for(int i = 0; i < 10; i++){//TOOD: change to time, instead of depth
+		for(int i = 0; i < 3; i++){//TOOD: change to time, instead of depth
 			lastPath = DepthLimitedAStar(start, target, curDepth);
 			curDepth++;
 		}
@@ -111,21 +104,34 @@ public class Map : MonoBehaviour {
 		return lastPath;
 	}
 
-	Node[] DepthLimitedAStar(Node start, Node target, int depth){
+	Node[] DepthLimitedAStar(Node start, Node target, int maxDepth){
 		List<Node> open = new List<Node>();
 		List<Node> closed = new List<Node>();
+		List<Node> fringe = new List<Node>();
 		open.Add(start);
+		start.Depth = 0;
 
 		Node cur;
 
 		while(open.Count != 0){
-			cur = open[0];//Node with lowest f-cost
+			//cur = open[0];//Node with lowest f-cost
+			cur = Node.LowestFCost(open);
+
+			if(cur.Depth == maxDepth){//We hit the depth limit, so just pick the best looking final node... (TODO: is this correct?)
+				fringe.Add(cur);
+			}
+
 			open.Remove(cur);
 			closed.Add(cur);
 
 			if(cur == target){
 				return Node.RebuildPath(target);
 			}
+
+			/*if(cur.Depth == maxDepth){
+				open.Remove(cur);
+				closed.Add(cur);
+			}*/
 
 			foreach(Node n in this.Neighbours(cur)){
 				if(n.Movement == 0 || closed.Contains(n)){
@@ -136,32 +142,20 @@ public class Map : MonoBehaviour {
 					n.GCost = cur.GCost + this.NodeDist(cur, n);
 					n.HCost = this.NodeDist(n, target);
 					n.PathParent = cur;
-					if(!open.Contains(n)){
+					n.Depth = cur.Depth + 1;
+
+					if(!open.Contains(n) && cur.Depth < maxDepth){//Don't add children, if we're already at max depth
 						open.Add(n);
 					}
 				}
 			}
 
 		}
+		Debug.Log("hit limit, how do I pick best option?");
 
-		return null;
+		return Node.RebuildPath(Node.LowestFCost(fringe));
 	}
 
-	Node LowestFCost(Node[] nodes){
-		Node lowest;
-		lowest = nodes[0];
-
-		foreach(Node n in nodes){
-			if(n.FCost < lowest.FCost){
-				lowest = n;
-			}
-			else if(n.FCost == lowest.FCost && n.GCost < lowest.GCost){
-				lowest = n;
-			}
-		}
-
-		return lowest;
-	}
 
 	public Node this[int x, int y]{
 		get{

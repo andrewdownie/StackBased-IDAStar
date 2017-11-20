@@ -15,6 +15,8 @@ public class Node{
 	[SerializeField]
 	Node pathParent;
 
+	int depth;
+
 	public Node(Map map, int id, int x, int y, float movement){
 		this.movement = movement;
 		this.map = map;
@@ -22,9 +24,15 @@ public class Node{
 		this.x = x;
 		this.y = y;
 
+		pathParent = null;
 		hCost = 0;
 		gCost = 0;
-		pathParent = null;
+		depth = 0;
+	}
+
+	public int Depth{
+		get{return depth;}
+		set{depth = value;}
 	}
 
 	public Node PathParent{
@@ -76,6 +84,22 @@ public class Node{
 		path.Reverse();
 
 		return path.ToArray();
+	}
+
+	public static Node LowestFCost(List<Node> nodes){
+		Node lowest;
+		lowest = nodes[0];
+
+		foreach(Node n in nodes){
+			if(n.FCost < lowest.FCost){
+				lowest = n;
+			}
+			else if(n.FCost == lowest.FCost && n.GCost < lowest.GCost){
+				lowest = n;
+			}
+		}
+
+		return lowest;
 	}
 
 }
