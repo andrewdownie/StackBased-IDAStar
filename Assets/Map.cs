@@ -2,42 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class Node{
-	float movement;
-	Map parent;
-	[SerializeField]
-	int id;
-	[SerializeField]
-	int x, y;
-
-	public Node(Map parent, int id, int x, int y, float movement){
-		this.movement = movement;
-		this.parent = parent;
-		this.id = id;
-		this.x = x;
-		this.y = y;
-	}
-
-
-	//TODO: pretty sure x and y are mixed up-------------------------------------------------
-	public int X{
-		get{return x;}
-	}
-
-	public int Y{
-		get{return y;}
-	}
-
-	public float Movement{
-		get{return movement;}
-	}
-
-	public int ID{
-		get{return id;}
-	}
-
-}
 
 
 public class Map : MonoBehaviour {
@@ -118,7 +82,7 @@ public class Map : MonoBehaviour {
 	}
 
 
-
+	//TODO: candidate to become extension method
 	public void FindPath(PathAgent agent){
 		Vector3 curPos = agent.CurPos;
 		Vector3 targetPos = agent.TargetPos;
@@ -126,25 +90,20 @@ public class Map : MonoBehaviour {
 
 
 
-		//agent.Path = IDAStar(curPos, targetPos);
 		curNode = this.PosToNode(curPos);
-		//targetNode = this.PosToNode(targetPos);
-		Debug.Log("Neighbours are... " + curPos + " - " + curNode.X + "," + curNode.Y);
-		testingNeighbours = new List<Node>(this.Neighbours(curNode));
+		targetNode = this.PosToNode(targetPos);
+		agent.Path = IterativeDeepeningAStar(curNode, targetNode);
+		//testingNeighbours = new List<Node>(this.Neighbours(curNode));
 	}
 
 
-	int[] IDAStar(Vector2 curPos, Vector2 targetPos){
+	Node[] IterativeDeepeningAStar(Node start, Node target){
 		//TODO: put a time limit, and then perform IDAStar until that time limit is hit, return the most recent completed result
-		int start = (int)curPos.y * width + (int)curPos.x;
-		int target = (int)targetPos.y * width + (int)targetPos.x;
-
-		Debug.Log("Start: " + start);
-		int[] lastPath = null;
+		Node[] lastPath = null;
 		int curDepth = 1;
 
 		for(int i = 0; i < 10; i++){//TOOD: change to time, instead of depth
-			lastPath = _IDAStar(start, target, curDepth);
+			lastPath = DepthLimitedAStar(start, target, curDepth);
 			curDepth++;
 		}
 		
@@ -152,16 +111,56 @@ public class Map : MonoBehaviour {
 		return lastPath;
 	}
 
-	int[] _IDAStar(int start, int target, int depth){
-		List<int> open = new List<int>();//How do I store f-costs without using objects
-		List<int> closed = new List<int>();
+	Node[] DepthLimitedAStar(Node start, Node target, int depth){
+		List<Node> open = new List<Node>();
+		List<Node> closed = new List<Node>();
 		open.Add(start);
 
+		Node cur;
+
 		while(open.Count != 0){
+			cur = open[0];//Node with lowest f-cost
+			open.Remove(cur);
+			closed.Add(cur);
+
+			if(cur == target){
+				return Node.RebuildPath(target);
+			}
+
+			foreach(Node n in this.Neighbours(cur)){
+				if(n.Movement == 0 || closed.Contains(n)){
+					continue;
+				}
+
+				if(!open.Contains(n) || cur.GCost + this.NodeDist(cur, n) < n.GCost){
+					n.GCost = cur.GCost + this.NodeDist(cur, n);
+					n.HCost = this.NodeDist(n, target);
+					n.PathParent = cur;
+					if(!open.Contains(n)){
+						open.Add(n);
+					}
+				}
+			}
 
 		}
 
 		return null;
+	}
+
+	Node LowestFCost(Node[] nodes){
+		Node lowest;
+		lowest = nodes[0];
+
+		foreach(Node n in nodes){
+			if(n.FCost < lowest.FCost){
+				lowest = n;
+			}
+			else if(n.FCost == lowest.FCost && n.GCost < lowest.GCost){
+				lowest = n;
+			}
+		}
+
+		return lowest;
 	}
 
 	public Node this[int x, int y]{

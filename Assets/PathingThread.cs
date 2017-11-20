@@ -35,7 +35,7 @@ public class PathingThread : MonoBehaviour{
 		try{
 
 			while(true){
-				Debug.Log("This is thread");
+				//Debug.Log("This is thread");
 
 
 				if(agents.Count > 0){

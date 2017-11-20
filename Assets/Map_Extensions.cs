@@ -11,15 +11,15 @@ public static class Map_Extensions{
 
 		y = node.Y;
 		x = node.X;
-		Debug.Log("neighbours of node: " + x + ", " + y);
+		//Debug.Log("neighbours of node: " + x + ", " + y);
 
 		top = y == 0;
 		bottom = y == map.Height - 1;
 		left = x == 0;
 		right = x == map.Width - 1;
 
-		Debug.Log("x,y: " + y + "," + x);
-		Debug.Log(top + ", " + left + ", " + bottom + ", " + right);
+		//Debug.Log("x,y: " + y + "," + x);
+		//Debug.Log(top + ", " + left + ", " + bottom + ", " + right);
 
 
 		//Very unclever, but should perform fast enough
@@ -106,12 +106,29 @@ public static class Map_Extensions{
 
 		int x = (int)pos.x;
 		int y = (int)pos.z;
-		Debug.Log("Pos to node: " + x + ", " + y);
 
 		n = map[x, y];
 
 		return n;
 	}
+
+
+	public static int NodeDist(this Map map, Node a, Node b){
+		//TODO: how do I add node weighting to this? ---------------------
+		int dx, dy;
+		dx = Mathf.Abs(a.X - b.X);
+		dy = Mathf.Abs(a.Y - b.Y);
+
+
+		int straight, angle;
+		straight = Mathf.Min(dx, dy);
+		angle = Mathf.Max(dx, dy);
+
+
+		return Mathf.RoundToInt(angle * 14f + straight * 10);
+	}
+
+
 
 
 }
