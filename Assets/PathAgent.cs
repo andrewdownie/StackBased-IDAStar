@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PathAgent : MonoBehaviour {
-	string objectName;
 
 	[SerializeField]
 	Vector3 curPos, targetPos;
 
 	Node[] curPath;
 
+	float lastRequestTime;
+
 
 	void Start(){
-		targetPos = new Vector2(Random.Range(0, 9), Random.Range(0, 9));
-		objectName = transform.name;
 		PathingThread.singleton.RegisterPathAgent(this);
 	}
 	void OnDestroy() {
@@ -38,6 +37,9 @@ public class PathAgent : MonoBehaviour {
 	}
 
 	void PrintCurPath(){
+		return;
+
+
 		if(curPath == null){
 			return;
 		}
@@ -54,6 +56,11 @@ public class PathAgent : MonoBehaviour {
 	public Vector3 TargetPos{get{return targetPos;}}
 
 	public Node[] Path{set{curPath = value;}}
+
+	public float LastRequestTime{
+		get{return lastRequestTime;}
+		set{lastRequestTime = value;}
+	}
 
 
 }

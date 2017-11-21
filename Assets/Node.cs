@@ -88,6 +88,11 @@ public class Node{
 
 	public static Node LowestFCost(List<Node> nodes){
 		Node lowest;
+
+		if(nodes.Count == 0){
+			return null;
+		}
+
 		lowest = nodes[0];
 
 		foreach(Node n in nodes){

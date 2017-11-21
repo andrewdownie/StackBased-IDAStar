@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 
@@ -20,6 +21,8 @@ public class Map : MonoBehaviour {
 	int height;
 	[SerializeField]
 	Node[,] nodes;
+
+	float curTime;
 	//Variable: movement ----
 	//	Inverse percent. Think about it as modifying the effective distance the player has to move to get to a point.
 	//	100 means the player moves regular speed.
@@ -36,6 +39,10 @@ public class Map : MonoBehaviour {
 	}
 	public int Height{
 		get{return height;}
+	}
+
+	void Update(){
+		curTime = Time.time;
 	}
 
 	void Start(){
@@ -76,8 +83,12 @@ public class Map : MonoBehaviour {
 	}
 
 
-	//TODO: candidate to become extension method
 	public void FindPath(PathAgent agent){
+		//UnityEngine.Debug.Log(curTime);
+		if(agent.LastRequestTime + 0.5f > curTime){
+			return;//Wait 500 ms between each agent request
+		}
+
 		Vector3 curPos = agent.CurPos;
 		Vector3 targetPos = agent.TargetPos;
 		Node curNode, targetNode;
@@ -87,37 +98,49 @@ public class Map : MonoBehaviour {
 		curNode = this.PosToNode(curPos);
 		targetNode = this.PosToNode(targetPos);
 		agent.Path = IterativeDeepeningAStar(curNode, targetNode);
+		agent.LastRequestTime = curTime;
 	}
 
 
 	Node[] IterativeDeepeningAStar(Node start, Node target){
-		//TODO: put a time limit, and then perform IDAStar until that time limit is hit, return the most recent completed result
+		UnityEngine.Debug.Log("start node is: " + start.X + ", " + start.Y);
 		Node[] lastPath = null;
 		int curDepth = 1;
 
-		for(int i = 0; i < 3; i++){//TOOD: change to time, instead of depth
+		int msLimit = 14;
+		int msHalfLimit = msLimit / 2;
+
+		Stopwatch sw = new Stopwatch();
+		sw.Start();
+
+		while(sw.Elapsed.TotalMilliseconds < msHalfLimit){
 			lastPath = DepthLimitedAStar(start, target, curDepth);
 			curDepth++;
 		}
-		
+
+		sw.Stop();
+
+		int timePassed = (int)sw.Elapsed.TotalMilliseconds;
+		if(timePassed > msLimit){
+			UnityEngine.Debug.LogWarning("Pathfinding took " + timePassed + " before it was able to abort.");
+		}
 
 		return lastPath;
 	}
 
 	Node[] DepthLimitedAStar(Node start, Node target, int maxDepth){
-		List<Node> open = new List<Node>();
+		List<Node> open = new List<Node>();//TODO: replace this with a heap
 		List<Node> closed = new List<Node>();
-		List<Node> fringe = new List<Node>();
+		List<Node> fringe = new List<Node>();//TODO: replace this with a heap
 		open.Add(start);
 		start.Depth = 0;
 
 		Node cur;
 
 		while(open.Count != 0){
-			//cur = open[0];//Node with lowest f-cost
 			cur = Node.LowestFCost(open);
 
-			if(cur.Depth == maxDepth){//We hit the depth limit, so just pick the best looking final node... (TODO: is this correct?)
+			if(cur.Depth == maxDepth){
 				fringe.Add(cur);
 			}
 
@@ -127,11 +150,6 @@ public class Map : MonoBehaviour {
 			if(cur == target){
 				return Node.RebuildPath(target);
 			}
-
-			/*if(cur.Depth == maxDepth){
-				open.Remove(cur);
-				closed.Add(cur);
-			}*/
 
 			foreach(Node n in this.Neighbours(cur)){
 				if(n.Movement == 0 || closed.Contains(n)){
@@ -144,14 +162,14 @@ public class Map : MonoBehaviour {
 					n.PathParent = cur;
 					n.Depth = cur.Depth + 1;
 
-					if(!open.Contains(n) && cur.Depth < maxDepth){//Don't add children, if we're already at max depth
+					if(!open.Contains(n) && cur.Depth < maxDepth){
 						open.Add(n);
 					}
 				}
 			}
 
 		}
-		Debug.Log("hit limit, how do I pick best option?");
+
 
 		return Node.RebuildPath(Node.LowestFCost(fringe));
 	}
