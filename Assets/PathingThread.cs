@@ -18,6 +18,9 @@ public class PathingThread : MonoBehaviour{
 		agents = new List<PathAgent>();
 		curAgentIndex = 0;
 
+	}
+
+	void Start(){
 		Debug.Log("Start thread");
 
 		workerThread = new Thread(PathFinding);

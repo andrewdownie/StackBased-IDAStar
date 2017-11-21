@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Heap.cs" />
-     <Compile Include="Assets\Int2.cs" />
      <Compile Include="Assets\Map.cs" />
      <Compile Include="Assets\Map_Extensions.cs" />
      <Compile Include="Assets\Node.cs" />

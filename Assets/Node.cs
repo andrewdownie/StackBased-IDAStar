@@ -17,6 +17,13 @@ public class Node{
 
 	int depth;
 
+	public void Clear(){
+		hCost = 0;
+		gCost = 0;
+		pathParent = null;
+		depth = 0;
+	}
+
 	public Node(Map map, int id, int x, int y, float movement){
 		this.movement = movement;
 		this.map = map;

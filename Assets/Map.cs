@@ -76,7 +76,7 @@ public class Map : MonoBehaviour {
 				else{
 					Gizmos.color = new Color(movement, movement, movement);
 				}
-				Gizmos.DrawCube(transform.position + new Vector3(x, 0, y), new Vector3(0.6f, 0.1f, 0.6f));
+				Gizmos.DrawCube(transform.position + new Vector3(x, 0, y), new Vector3(0.95f, 0.1f, 0.95f));
 
 			}
 		}
@@ -84,19 +84,15 @@ public class Map : MonoBehaviour {
 
 
 	public void FindPath(PathAgent agent){
+		Node curNode, targetNode;
 		//UnityEngine.Debug.Log(curTime);
 		if(agent.LastRequestTime + 0.5f > curTime){
 			return;//Wait 500 ms between each agent request
 		}
 
-		Vector3 curPos = agent.CurPos;
-		Vector3 targetPos = agent.TargetPos;
-		Node curNode, targetNode;
 
-
-
-		curNode = this.PosToNode(curPos);
-		targetNode = this.PosToNode(targetPos);
+		curNode = this.PosToNode(agent.CurPos);
+		targetNode = this.PosToNode(agent.TargetPos);
 		agent.Path = IterativeDeepeningAStar(curNode, targetNode);
 		agent.LastRequestTime = curTime;
 	}
@@ -135,6 +131,7 @@ public class Map : MonoBehaviour {
 		open.Add(start);
 		start.Depth = 0;
 
+		Node[] path;
 		Node cur;
 
 		while(open.Count != 0){
@@ -148,7 +145,11 @@ public class Map : MonoBehaviour {
 			closed.Add(cur);
 
 			if(cur == target){
-				return Node.RebuildPath(target);
+				path = Node.RebuildPath(target);
+				ClearNodeList(open);
+				ClearNodeList(closed);//TODO: does clearing actually help?
+				ClearNodeList(fringe);
+				return path;
 			}
 
 			foreach(Node n in this.Neighbours(cur)){
@@ -170,8 +171,17 @@ public class Map : MonoBehaviour {
 
 		}
 
+		path = Node.RebuildPath(Node.LowestFCost(fringe));
+		ClearNodeList(open);
+		ClearNodeList(closed);//TODO: does clearing actually help?
+		ClearNodeList(fringe);
+		return path;
+	}
 
-		return Node.RebuildPath(Node.LowestFCost(fringe));
+	void ClearNodeList(List<Node> nodes){
+		foreach(Node n in nodes){
+			n.Clear();
+		}
 	}
 
 

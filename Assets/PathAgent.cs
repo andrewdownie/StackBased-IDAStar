@@ -23,36 +23,29 @@ public class PathAgent : MonoBehaviour {
 		//curPos = new Vector2(transform.position.x, transform.position.z);
 
 		//TODO: follow path here ------------------------------
-		PrintCurPath();
 	}
 
 	void OnDrawGizmos(){
 		if(curPath == null || curPath.Length == 0){ return; }
 
-		foreach(Node n in curPath){
-			Gizmos.color = Color.yellow;
+		for(int i = 0; i < curPath.Length; i++){
+			Node n = curPath[i];
+
+			if(i == 0){
+				Gizmos.color = new Color(70, 255, 0);
+			}
+			else if(i == curPath.Length - 1){
+				Gizmos.color = new Color(150, 0, 150);
+			}
+			else{
+				Gizmos.color = new Color(0, 150, 150);
+			}
 			Gizmos.DrawCube(new Vector3(n.X, 3, n.Y), new Vector3(0.3f, 1f, 0.3f));
 		}
 
 	}
 
-	void PrintCurPath(){
-		return;
-
-
-		if(curPath == null){
-			return;
-		}
-
-		string output = "{ ";
-		foreach(Node n in curPath){
-			output += "(" + n.X + "," + n.Y + "), ";
-		}
-		output += " }";
-		Debug.Log(output);
-	}
-
-	public Vector3 CurPos{get{return curPos;}}
+	public Vector3 CurPos{get{return new Vector3(curPos.x, curPos.y, curPos.z);}}
 	public Vector3 TargetPos{get{return targetPos;}}
 
 	public Node[] Path{set{curPath = value;}}
