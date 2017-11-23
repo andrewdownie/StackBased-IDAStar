@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{F88E4485-F025-62BE-DC87-826A3C5AE9E7}</ProjectGuid>
+    <ProjectGuid>{43F231E7-8D66-8857-22FD-555464A81884}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -52,11 +52,13 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Heap.cs" />
+     <Compile Include="Assets\IDAStar.cs" />
      <Compile Include="Assets\Map.cs" />
      <Compile Include="Assets\Map_Extensions.cs" />
      <Compile Include="Assets\Node.cs" />
      <Compile Include="Assets\PathAgent.cs" />
      <Compile Include="Assets\PathingThread.cs" />
+     <Compile Include="Assets\PathNode.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
